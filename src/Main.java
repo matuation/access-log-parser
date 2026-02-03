@@ -1,11 +1,29 @@
+import java.io.File;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
 
-        System.out.println("Введите текст и нажмите <Enter>: ");
-        String text = new Scanner(System.in).nextLine();
-        System.out.println("Длина текста: " + text.length());
-
+        int goodEntryCounter = 0;
+        for (int i = 1; i != -1; i++) {
+            System.out.println("Введите путь к файлу и нажмите <Enter>: ");
+            String path = new Scanner(System.in).nextLine();
+            File file = new File(path);
+            boolean fileExist = file.exists();
+            boolean isDirectory = file.isDirectory();
+            if (fileExist && !isDirectory) {
+                System.out.println("Путь указан верно");
+                goodEntryCounter++;
+                System.out.println("Это файл номер " + goodEntryCounter);
+                continue;
+            }
+            if (fileExist && isDirectory) {
+                System.out.println("Указанный путь - директория");
+                continue;
+            }
+            if (!fileExist) {
+                System.out.println("Указанный файл не существует");
+            }
+        }
     }
 }
