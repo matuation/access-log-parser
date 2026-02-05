@@ -17,13 +17,11 @@ public class Main {
                 System.out.println("Это файл номер " + goodEntryCounter);
                 continue;
             }
-            if (fileExist && isDirectory) {
+            if (isDirectory) {
                 System.out.println("Указанный путь - директория");
                 continue;
             }
-            if (!fileExist) {
-                System.out.println("Указанный файл не существует");
-            }
+            System.out.println("Указанный файл не существует");
         }
     }
 }
