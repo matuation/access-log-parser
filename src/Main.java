@@ -7,6 +7,8 @@ public class Main {
     public static void main(String[] args) {
 
         int goodEntryCounter = 0;
+        LogEntry logEntry;
+        Statistics statistics = new Statistics();
         for (int i = 1; i != -1; i++) {
             System.out.println("Введите путь к файлу и нажмите <Enter>: ");
             String path = new Scanner(System.in).nextLine();
@@ -43,10 +45,14 @@ public class Main {
                         if (length > 1024) {
                             throw new exceededLineLengthException();
                         }
+                        logEntry = new LogEntry(line);
+                        statistics.addEntry(logEntry);
                     }
+                    System.out.println(statistics);
                     System.out.println("Файл содержит " + totalLines + " строк");
                     System.out.println("Запросов от YandexBot: " + yandexBot);
                     System.out.println("Запросов от Googlebot: " + googleBot);
+
 
                 } catch (Exception ex) {
                     ex.printStackTrace();
