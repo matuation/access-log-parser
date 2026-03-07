@@ -57,13 +57,17 @@ public class Main {
                     System.out.println("Файл содержит " + totalLines + " строк");
                     System.out.println("Доля запросов от YandexBot: " + yandexPart);
                     System.out.println("Доля запросов от Googlebot: " + googlePart);
-                    System.out.println(statistics.getExistingPages().size());
-                    System.out.println(statistics.getNotExistingPages().size());
-                    System.out.println(statistics.getOpSysAmountStatistics());
-                    System.out.println(statistics.getBrowserAmountStatistics());
-                    System.out.println(statistics.getAverageVisitsPerHour());
-                    System.out.println(statistics.getAverageErrorRequestsPerHour());
-                    System.out.println(statistics.getAverageUniqueHumanVisit());
+                    System.out.println("Всего существует страниц: " + statistics.getExistingPages().size());
+                    System.out.println("Всего ошибочных страниц: " + statistics.getNotExistingPages().size());
+                    System.out.println("Статистика ОС: " + statistics.getOpSysAmountStatistics());
+                    System.out.println("Статистика браузеров: " + statistics.getBrowserAmountStatistics());
+                    System.out.println("Визитов в час в среднем: " + statistics.getAverageVisitsPerHour());
+                    System.out.println("Ошибочных запросов в час в среднем: " + statistics.getAverageErrorRequestsPerHour());
+                    System.out.println("Визитов одного пользователя в среднем: " + statistics.getAverageUniqueHumanVisit());
+                    System.out.println("Максимум визитов в секунду: " + statistics.getPeakVisitsPerSecond());
+                    System.out.println("Домены с которых переходили: " + statistics.getUniqueReferrer());
+                    System.out.println("Максимум визитов одного пользователя: " + statistics.maxOneHumanVisit());
+
 
 
                 } catch (Exception ex) {

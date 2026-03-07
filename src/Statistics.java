@@ -1,8 +1,7 @@
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Statistics {
     long totalTraffic;
@@ -14,9 +13,11 @@ public class Statistics {
     LocalDateTime maxTime;
     HashSet<String> existingPages;
     HashSet<String> notExistingPages;
+    HashSet<String> uniqueReferrer;
     HashMap<String, Integer> uniqueOneIpRequests;
     HashMap<String, Integer> opSysStatistics;
     HashMap<String, Integer> browserStatistics;
+    HashMap<LocalDateTime, Integer> peakVisitsPerSecond;
 
 
     public Statistics() {
@@ -29,9 +30,12 @@ public class Statistics {
         this.maxTime = null;
         this.existingPages = new HashSet<>();
         this.notExistingPages = new HashSet<>();
+        this.uniqueReferrer = new HashSet<>();
         this.uniqueOneIpRequests = new HashMap<>();
         this.opSysStatistics = new HashMap<>();
         this.browserStatistics = new HashMap<>();
+        this.peakVisitsPerSecond = new HashMap<>();
+
     }
 
     @Override
@@ -41,6 +45,7 @@ public class Statistics {
 
     public void addEntry(LogEntry entry) {
         totalTraffic += entry.getResponseSize();
+
         if (entry.getUserAgent().getOperatingSystem() != null) {
             totalOpSys++;
         }
@@ -52,20 +57,27 @@ public class Statistics {
             maxTime = entry.getDateAndTime();
             return;
         }
+
         if (entry.getDateAndTime().isBefore(minTime)) {
             minTime = entry.getDateAndTime();
         }
         if (entry.getDateAndTime().isAfter(maxTime)) {
             maxTime = entry.getDateAndTime();
         }
-        if (entry.getIpAddress() != null && !entry.getUserAgent().isBot()) {
+        if (!entry.getIpAddress().equals("-") && !entry.getUserAgent().isBot()) {
             uniqueOneIpRequests.merge(entry.getIpAddress(), 1, Integer::sum);
+        }
+        if (entry.getDateAndTime() != null && !entry.getUserAgent().isBot()) {
+            peakVisitsPerSecond.merge(entry.getDateAndTime(), 1, Integer::sum);
         }
         if (entry.getResponseCode() == 200) {
             existingPages.add(entry.getRequestPath());
         }
         if (entry.getResponseCode() == 404) {
             notExistingPages.add(entry.getRequestPath());
+        }
+        if (!entry.getReferer().equals("-")) {
+            uniqueReferrer.add(entry.getReferer());
         }
         if ((entry.getResponseCode() >= 400) && (entry.getResponseCode() < 600)){
             errorRequest++;
@@ -136,4 +148,20 @@ public class Statistics {
     public long getAverageUniqueHumanVisit(){
         return humanVisit / uniqueOneIpRequests.size();
     }
+
+    public int getPeakVisitsPerSecond(){
+        return peakVisitsPerSecond.values().stream().max(Integer::compare).get();
+    }
+
+    public HashSet<String> getUniqueReferrer(){
+         return uniqueReferrer.stream().map(o -> o.replace("https://", "")
+                .replace("http://", "").replace("https%3A%2F%2F", "")
+                .split("[/&]")[0]).collect(Collectors.toCollection(HashSet::new));
+    }
+
+    public long maxOneHumanVisit() {
+        return uniqueOneIpRequests.values().stream().max(Integer::compare).get();
+    }
+
+
 }
