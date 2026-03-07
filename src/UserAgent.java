@@ -4,8 +4,11 @@ import java.util.regex.Pattern;
 public class UserAgent {
     final String operatingSystem;
     final String browser;
+    String thisUserAgent;
+    boolean isThisBot;
 
     public UserAgent(String line) {
+        this.thisUserAgent = line;
         Pattern linuxPattern = Pattern.compile(".*Linux.*");
         Pattern windowsPattern = Pattern.compile(".*Windows.*");
         Pattern macPattern = Pattern.compile(".*Mac OS.*");
@@ -22,7 +25,7 @@ public class UserAgent {
             this.operatingSystem = "Other";
         }
         Pattern firefoxPattern = Pattern.compile(".*Firefox.*");
-        Pattern chromePattern = Pattern.compile(".*Linux.*");
+        Pattern chromePattern = Pattern.compile(".*Chrome.*");
         Pattern operaPattern = Pattern.compile(".*OPR.*");
         Pattern edgePattern = Pattern.compile(".*Edg.*");
         Pattern safariPattern = Pattern.compile(".*Safari.*");
@@ -45,6 +48,15 @@ public class UserAgent {
         } else {
             this.browser = "Other";
         }
+
+
+    }
+
+    boolean isBot () {
+        Pattern botPattern = Pattern.compile(".*bot/.*", Pattern.CASE_INSENSITIVE);
+        Matcher botMatcher = botPattern.matcher(thisUserAgent);
+        isThisBot = botMatcher.find();
+        return isThisBot;
     }
 
     public String getBrowser() {
@@ -54,6 +66,8 @@ public class UserAgent {
     public String getOperatingSystem() {
         return operatingSystem;
     }
+
+
 
     @Override
     public String toString() {

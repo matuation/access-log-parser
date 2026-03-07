@@ -8,10 +8,13 @@ public class Statistics {
     long totalTraffic;
     int totalOpSys;
     int totalBrowser;
+    int humanVisit;
+    int errorRequest;
     LocalDateTime minTime;
     LocalDateTime maxTime;
     HashSet<String> existingPages;
     HashSet<String> notExistingPages;
+    HashMap<String, Integer> uniqueOneIpRequests;
     HashMap<String, Integer> opSysStatistics;
     HashMap<String, Integer> browserStatistics;
 
@@ -20,10 +23,13 @@ public class Statistics {
         this.totalTraffic = 0;
         this.totalOpSys = 0;
         this.totalBrowser = 0;
+        this.humanVisit = 0;
+        this.errorRequest = 0;
         this.minTime = null;
         this.maxTime = null;
         this.existingPages = new HashSet<>();
         this.notExistingPages = new HashSet<>();
+        this.uniqueOneIpRequests = new HashMap<>();
         this.opSysStatistics = new HashMap<>();
         this.browserStatistics = new HashMap<>();
     }
@@ -52,15 +58,25 @@ public class Statistics {
         if (entry.getDateAndTime().isAfter(maxTime)) {
             maxTime = entry.getDateAndTime();
         }
+        if (entry.getIpAddress() != null && !entry.getUserAgent().isBot()) {
+            uniqueOneIpRequests.merge(entry.getIpAddress(), 1, Integer::sum);
+        }
         if (entry.getResponseCode() == 200) {
             existingPages.add(entry.getRequestPath());
         }
         if (entry.getResponseCode() == 404) {
             notExistingPages.add(entry.getRequestPath());
         }
+        if ((entry.getResponseCode() >= 400) && (entry.getResponseCode() < 600)){
+            errorRequest++;
+        }
+        if (!entry.getUserAgent().isBot()){
+            humanVisit++;
+        }
 
         opSysStatistics.merge(entry.getUserAgent().operatingSystem, 1, Integer::sum);
         browserStatistics.merge(entry.getUserAgent().browser, 1, Integer::sum);
+
     }
 
 
@@ -100,8 +116,24 @@ public class Statistics {
 
         HashMap<String, Double> browserAmount = new HashMap<>();
         for (Map.Entry<String, Integer> entry : browserStatistics.entrySet()) {
-            browserAmount.put(entry.getKey(), Math.round(((double) entry.getValue() / totalBrowser) * 1000.0) / 1000.0);
+            browserAmount.put(entry.getKey(), Math.round(((double) entry.getValue() / totalBrowser) * 100.0) / 100.0);
         }
         return browserAmount;
+    }
+
+    public long getAverageVisitsPerHour(){
+        Duration duration = Duration.between(minTime, maxTime);
+        long durationHours = duration.toHours();
+        return humanVisit / durationHours;
+    }
+
+    public long getAverageErrorRequestsPerHour(){
+        Duration duration = Duration.between(minTime, maxTime);
+        long durationHours = duration.toHours();
+        return errorRequest / durationHours;
+    }
+
+    public long getAverageUniqueHumanVisit(){
+        return humanVisit / uniqueOneIpRequests.size();
     }
 }

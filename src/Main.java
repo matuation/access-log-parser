@@ -61,6 +61,9 @@ public class Main {
                     System.out.println(statistics.getNotExistingPages().size());
                     System.out.println(statistics.getOpSysAmountStatistics());
                     System.out.println(statistics.getBrowserAmountStatistics());
+                    System.out.println(statistics.getAverageVisitsPerHour());
+                    System.out.println(statistics.getAverageErrorRequestsPerHour());
+                    System.out.println(statistics.getAverageUniqueHumanVisit());
 
 
                 } catch (Exception ex) {
