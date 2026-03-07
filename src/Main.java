@@ -18,6 +18,8 @@ public class Main {
             int totalLines = 0;
             int yandexBot = 0;
             int googleBot = 0;
+            double yandexPart = 0.0;
+            double googlePart = 0.0;
             if (fileExist && !isDirectory) {
                 System.out.println("Путь указан верно");
                 goodEntryCounter++;
@@ -48,10 +50,12 @@ public class Main {
                         logEntry = new LogEntry(line);
                         statistics.addEntry(logEntry);
                     }
+                    yandexPart = Math.round(((double)yandexBot / totalLines) * 100.0) / 100.0;
+                    googlePart = Math.round(((double)googleBot / totalLines) * 100.0) / 100.0;
                     System.out.println(statistics);
                     System.out.println("Файл содержит " + totalLines + " строк");
-                    System.out.println("Запросов от YandexBot: " + yandexBot);
-                    System.out.println("Запросов от Googlebot: " + googleBot);
+                    System.out.println("Доля запросов от YandexBot: " + yandexPart);
+                    System.out.println("Доля запросов от Googlebot: " + googlePart);
 
 
                 } catch (Exception ex) {
@@ -67,3 +71,4 @@ public class Main {
         }
     }
 }
+//C:\Users\supercomp_123456\Documents\reclass\access.log
