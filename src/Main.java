@@ -49,7 +49,7 @@ public class Main {
                         }
                         logEntry = new LogEntry(line);
                         statistics.addEntry(logEntry);
-                        statistics.getExistingPages();
+
                     }
                     yandexPart = Math.round(((double)yandexBot / totalLines) * 100.0) / 100.0;
                     googlePart = Math.round(((double)googleBot / totalLines) * 100.0) / 100.0;
@@ -58,7 +58,9 @@ public class Main {
                     System.out.println("Доля запросов от YandexBot: " + yandexPart);
                     System.out.println("Доля запросов от Googlebot: " + googlePart);
                     System.out.println(statistics.getExistingPages().size());
+                    System.out.println(statistics.getNotExistingPages().size());
                     System.out.println(statistics.getOpSysAmountStatistics());
+                    System.out.println(statistics.getBrowserAmountStatistics());
 
 
                 } catch (Exception ex) {

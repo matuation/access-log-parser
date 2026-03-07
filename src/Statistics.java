@@ -7,35 +7,39 @@ import java.util.Map;
 public class Statistics {
     long totalTraffic;
     int totalOpSys;
+    int totalBrowser;
     LocalDateTime minTime;
     LocalDateTime maxTime;
     HashSet<String> existingPages;
+    HashSet<String> notExistingPages;
     HashMap<String, Integer> opSysStatistics;
-
+    HashMap<String, Integer> browserStatistics;
 
 
     public Statistics() {
         this.totalTraffic = 0;
         this.totalOpSys = 0;
+        this.totalBrowser = 0;
         this.minTime = null;
         this.maxTime = null;
         this.existingPages = new HashSet<>();
+        this.notExistingPages = new HashSet<>();
         this.opSysStatistics = new HashMap<>();
+        this.browserStatistics = new HashMap<>();
     }
 
     @Override
     public String toString() {
-        return "Statistics{" +
-                "totalTraffic=" + totalTraffic +
-                ", minTime=" + minTime +
-                ", maxTime=" + maxTime +
-                '}';
+        return "Statistics{" + "totalTraffic=" + totalTraffic + ", minTime=" + minTime + ", maxTime=" + maxTime + '}';
     }
 
     public void addEntry(LogEntry entry) {
         totalTraffic += entry.getResponseSize();
-        if(entry.getUserAgent().getOperatingSystem() != null) {
+        if (entry.getUserAgent().getOperatingSystem() != null) {
             totalOpSys++;
+        }
+        if (entry.getUserAgent().getBrowser() != null) {
+            totalBrowser++;
         }
         if (minTime == null && maxTime == null) {
             minTime = entry.getDateAndTime();
@@ -48,12 +52,18 @@ public class Statistics {
         if (entry.getDateAndTime().isAfter(maxTime)) {
             maxTime = entry.getDateAndTime();
         }
-        if (entry.getResponseCode() == 200){
+        if (entry.getResponseCode() == 200) {
             existingPages.add(entry.getRequestPath());
+        }
+        if (entry.getResponseCode() == 404) {
+            notExistingPages.add(entry.getRequestPath());
         }
 
         opSysStatistics.merge(entry.getUserAgent().operatingSystem, 1, Integer::sum);
+        browserStatistics.merge(entry.getUserAgent().browser, 1, Integer::sum);
     }
+
+
 
     public long getTrafficRate() {
         Duration duration = Duration.between(minTime, maxTime);
@@ -65,8 +75,16 @@ public class Statistics {
         return existingPages;
     }
 
+    public HashSet<String> getNotExistingPages() {
+        return notExistingPages;
+    }
+
     public HashMap<String, Integer> getOpSysStatistics() {
         return opSysStatistics;
+    }
+
+    public HashMap<String, Integer> getBrowserStatistics() {
+        return browserStatistics;
     }
 
     public HashMap<String, Double> getOpSysAmountStatistics() {
@@ -76,5 +94,14 @@ public class Statistics {
             opSysAmount.put(entry.getKey(), Math.round(((double) entry.getValue() / totalOpSys) * 100.0) / 100.0);
         }
         return opSysAmount;
+    }
+
+    public HashMap<String, Double> getBrowserAmountStatistics() {
+
+        HashMap<String, Double> browserAmount = new HashMap<>();
+        for (Map.Entry<String, Integer> entry : browserStatistics.entrySet()) {
+            browserAmount.put(entry.getKey(), Math.round(((double) entry.getValue() / totalBrowser) * 1000.0) / 1000.0);
+        }
+        return browserAmount;
     }
 }
